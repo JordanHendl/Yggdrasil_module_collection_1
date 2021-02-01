@@ -1,0 +1,26 @@
+FIND_PACKAGE( Iris      REQUIRED )
+FIND_PACKAGE( Yggdrasil REQUIRED )
+
+SET( YGG_IMAGE_DOWNLOAD_MODULE_HEADERS 
+      HttpImageDownload.h
+   )
+
+SET( YGG_IMAGE_DOWNLOAD_MODULE_SOURCES
+      HttpImageDownload.cpp
+   )
+
+SET( YGG_IMAGE_DOWNLOAD_MODULE_LIBRARIES
+     iris_module
+     iris_bus
+     iris_log
+     ygghttp
+     yggdrasil
+     ${CMAKE_THREAD_LIBS_INIT}
+   )
+
+ADD_LIBRARY          ( ImageDownloader SHARED ${YGG_IMAGE_DOWNLOAD_MODULE_SOURCES} ${YGG_IMAGE_DOWNLOAD_MODULE_HEADERS} )
+TARGET_LINK_LIBRARIES( ImageDownloader PUBLIC ${YGG_IMAGE_DOWNLOAD_MODULE_LIBRARIES}                                    )
+
+BUILD_TEST( TARGET ImageDownloader DEPENDS ${YGG_IMAGE_DOWNLOAD_MODULE_LIBRARIES} )
+
+INSTALL( TARGETS ImageDownloader DESTINATION ${LIB_DIR} )
