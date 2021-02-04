@@ -47,16 +47,12 @@ namespace ygg
     unsigned channels() ;
     const unsigned char* bytes() ;
     void setURL( const char* url ) ;
-    void setOutputBytesName( const char* name ) ;
-    void setOutputWidthName( const char* name ) ;
-    void setOutputHeightName( const char* name ) ;
-    void setOutputChannelsName( const char* name ) ;
+    void setOutputName( unsigned idx, const char* name ) ;
 
     /** Default constructor.
      */
     HttpImageDownloaderData() ;
   };
-  
   
   unsigned HttpImageDownloaderData::width()
   {
@@ -81,30 +77,22 @@ namespace ygg
   void HttpImageDownloaderData::setURL( const char* url )
   {
     this->url = url ;
-    iris::log::Log::output( "Module ", this->name.c_str(), " downloading image: ", url ) ;
-    this->downloader.download( this->url.c_str() ) ;
+    iris::log::Log::output( "Module ", this->name(), " downloading image: ", data().url.c_str() ) ;
+    data().downloader.download( data().url.c_str() ) ;
   }
   
-  void HttpImageDownloaderData::setOutputBytesName( const char* name )
+  void HttpImageDownloaderData::setOutputName( unsigned idx, const char* name )
   {
-    this->bus.publish( this, &HttpImageDownloaderData::bytes, name ) ;
+    switch( idx )
+    {
+      case 0 : this->bus.publish( this, &HttpImageDownloaderData::bytes   , name ) ; break ;
+      case 1 : this->bus.publish( this, &HttpImageDownloaderData::width   , name ) ; break ;
+      case 2 : this->bus.publish( this, &HttpImageDownloaderData::height  , name ) ; break ;
+      case 3 : this->bus.publish( this, &HttpImageDownloaderData::channels, name ) ; break ;
+      default: break ;
+    }
   }
   
-  void HttpImageDownloaderData::setOutputWidthName( const char* name )
-  {
-    this->bus.publish( this, &HttpImageDownloaderData::width, name ) ;
-  }
-  
-  void HttpImageDownloaderData::setOutputHeightName( const char* name )
-  {
-    this->bus.publish( this, &HttpImageDownloaderData::height, name ) ;
-  }
-  
-  void HttpImageDownloaderData::setOutputChannelsName( const char* name )
-  {
-    this->bus.publish( this, &HttpImageDownloaderData::channels, name ) ;
-  }
-
   HttpImageDownloaderData::HttpImageDownloaderData()
   {
     this->name = "" ;
@@ -123,6 +111,7 @@ namespace ygg
 
   void HttpImageDownload::initialize()
   {
+
   }
 
   void HttpImageDownload::subscribe( unsigned id )
@@ -130,11 +119,8 @@ namespace ygg
     data().bus.setChannel( id ) ;
     data().name = this->name() ;
     
-    data().bus.enroll( this->module_data, &HttpImageDownloaderData::setOutputBytesName   , iris::OPTIONAL, this->name(), "::output_bytes"    ) ;
-    data().bus.enroll( this->module_data, &HttpImageDownloaderData::setOutputWidthName   , iris::OPTIONAL, this->name(), "::output_width"    ) ;
-    data().bus.enroll( this->module_data, &HttpImageDownloaderData::setOutputHeightName  , iris::OPTIONAL, this->name(), "::output_height"   ) ;
-    data().bus.enroll( this->module_data, &HttpImageDownloaderData::setOutputChannelsName, iris::OPTIONAL, this->name(), "::output_channels" ) ;
-    data().bus.enroll( this->module_data, &HttpImageDownloaderData::setURL               , iris::OPTIONAL, this->name(), "::image_url"       ) ;
+    data().bus.enroll( this->module_data, &HttpImageDownloaderData::setOutputName, iris::OPTIONAL, this->name(), "::outputs" ) ;
+    data().bus.enroll( this->module_data, &HttpImageDownloaderData::setURL       , iris::OPTIONAL, this->name(), "::url"     ) ;
   }
 
   void HttpImageDownload::shutdown()
@@ -145,11 +131,8 @@ namespace ygg
   {
     data().bus.wait() ;
     
-    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) ) ;
-    {
-      iris::log::Log::output( this->name(), " emitting data." ) ;
-      data().bus.emit() ;
-    }
+    iris::log::Log::output( this->name(), " emitting data." ) ;
+    data().bus.emit() ;
   }
 
   HttpImageDownloaderData& HttpImageDownload::data()
@@ -168,7 +151,7 @@ namespace ygg
  */
 exported_function const char* name()
 {
-  return "HttpImageDownloader" ;
+  return "Http Image Downloader" ;
 }
 
 /** Exported function to retrieve the version of this module.
