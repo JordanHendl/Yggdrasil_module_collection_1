@@ -78,7 +78,7 @@ IF( WIN32 )
   SET( CMAKE_PREFIX_PATH "C:/Program Files" CACHE STRING "The default path to look for dependancies." )
   SET( INSTALL_LOCATION "C:/Program Files" CACHE STRING "The default NSIS install location of this library" )
 ELSEIF( UNIX AND NOT APPLE )
-  SET( CMAKE_PREFIX_PATH "/usr/local/lib64/athena;/usr/local/lib64/iris;/usr/local/lib64/nyx" CACHE STRING "The default path to look for dependancies." )
+  SET( CMAKE_PREFIX_PATH "/usr/local/lib64/athena;/usr/local/lib64/iris;/usr/local/lib64/yggdrasil" CACHE STRING "The default path to look for dependancies." )
   SET( INSTALL_LOCATION  "/usr/local/lib64" CACHE STRING "The RPM install location of this library." ) 
 ENDIF()
 

@@ -77,8 +77,8 @@ namespace ygg
   void HttpImageDownloaderData::setURL( const char* url )
   {
     this->url = url ;
-    iris::log::Log::output( "Module ", this->name(), " downloading image: ", data().url.c_str() ) ;
-    data().downloader.download( data().url.c_str() ) ;
+    iris::log::Log::output( "Module ", this->name.c_str(), " downloading image: ", url ) ;
+    this->downloader.download( url ) ;
   }
   
   void HttpImageDownloaderData::setOutputName( unsigned idx, const char* name )
