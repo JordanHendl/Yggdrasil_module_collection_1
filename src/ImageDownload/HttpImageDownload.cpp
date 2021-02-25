@@ -130,8 +130,6 @@ namespace ygg
   void HttpImageDownload::execute()
   {
     data().bus.wait() ;
-    
-    iris::log::Log::output( this->name(), " emitting data." ) ;
     data().bus.emit() ;
   }
 
